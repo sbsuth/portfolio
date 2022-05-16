@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+     <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Portfolio Manager{+title /}</title>
+
+		<link rel="shortcut icon" href="/images/favicon.ico" />
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+	<!-- App CSS -->
+	<link href="/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/offcanvas.css" rel="stylesheet">
+	
+	  {+local_style /}
+
+  </head> 
+  <body>
+	<nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
+		<a class="navbar-brand" href="#">Portfolio Manager</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#portfolio-navbar" aria-controls="portfolio-navbar" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="portfolio-navbar">
+			<ul class="navbar-nav mb-auto">
+            <li class="nav-item"><a class="nav-link active" href="/strategies">Strategies</a></li>
+            <li class="nav-item"><a class="nav-link" href="/assets">Assets</a></li>
+			</ul>
+			<ul class="navbar-nav ms-auto">
+			{?session.user}
+            <li class="nav-item"><a class="nav-link " href="/logout">{session.user} <i>(logout)</i></a></div>
+			{:else}
+            <li class=nav-item><a class=nav-link href="/login">Login</a></li>
+			{/session.user}
+			</ul>
+		</div>
+	</nav>
+
+	{+bodyContent /}
+  <footer>
+	<div class="container">
+	  <p>&copy; Copyright 2022. </p>
+	</div>
+  </footer>
+
+
+	<!-- Bootstrap Javascript -->
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/bootstrap-checkbox.min.js" defer></script>
+	<script src="/js/bootstrap-select.min.js" defer></script>
+
+	<!-- App Javascript -->
+	<script src="/js/utils.c.js"></script>
+	{#load_javascript}
+	<script src="{.}"></script>
+	{/load_javascript}
+  </body>
+</html>
