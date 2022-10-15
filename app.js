@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 var logger = require('morgan');
 var session = require('express-session')
 var MongoStore = require('connect-mongo')
+var positions = require('./modules/positions');
+var utils = require("./modules/utils");
 
 var mongo = require('mongodb');
 var monk = require('monk');
@@ -27,7 +29,6 @@ var cons = require('consolidate')
 app.engine('dust', cons.dust);
 app.set('view engine', 'dust');
 
-var utils = require("./utils");
 utils.db = db;
 
 // Session setup.
@@ -73,6 +74,29 @@ app.use('/users', users);
 app.use('/', login.router);
 app.use('/', strategies.router);
 app.use('/', assets.router);
+
+utils.addDataDir("./data_files");
+positions.importSchwabPositions("positions.csv",utils).then( pos => {
+	if (1) {
+	console.log("[");
+	for ( let i=0; i < pos.length; i++ ) {
+		console.log("{");
+		let keys = Object.keys(pos[i]);
+		for ( let j=0; j < keys.length; j++ ) {
+			let sep = (j<(keys.length-1))?",":"";
+			let val = pos[i][keys[j]];
+			val = val.replace("$","");
+			if (isNaN(val) || !val) {
+				val = "\"" + String(val) + "\"";
+			}
+			console.log("  "+keys[j]+": "+val+sep);
+		}
+		let sep = (i<(pos.length-1))?",":"";
+		console.log("}"+sep);
+	}
+	console.log("]");
+	}
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

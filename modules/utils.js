@@ -1,5 +1,7 @@
 var request = require('request');
 var mongo = require("mongodb");
+var fs = require('fs');
+const csv = require('csv-parser')
 
 // File-scoped variables.
 var dust = 0;
@@ -174,21 +176,43 @@ function mongo_id_for_time( t ) {
 	return objt;
 }
 
-// Returns true if the given unit's address's last digit is in the given set of ints.
-function unit_addr_in_set( unit, addrs ) {
-	if ( !addrs || !unit || (addrs.length == 0)) {
-		return false;
-	}
-	var nums = unit.address.split('.');
-	if (nums.length < 4) {
-		return false;
-	}
-	var last_num = Number.parseInt(nums[3]);
-	if (last_num <= 0) {
-		return false;
-	}
-	return (addrs.indexOf(last_num) >= 0);
+
+async function* genForStream(strm) {
+  for await (const chunk of strm) {
+    yield chunk;
+  }
 }
+
+// Returns an async generator with rows from the CSV file at the given path.
+async function* genForCSV(csvPath) {
+  const strm = genForStream( fs.createReadStream(csvPath).pipe(csv()) );
+  for await (const chunk of strm) {
+    yield chunk;
+  }
+}
+
+var dataDirs = [];
+
+function addDataDir(dir) {
+    dataDirs.push(dir);
+}
+
+
+function dataFilePath(file) {
+	for ( var i=0; i < dataDirs.length; i++) {
+		var path = dataDirs[i] + "/" + file;
+		if (fs.existsSync(path)) {
+			return path;
+		}
+	}
+    return "";
+}
+
+function tickerCsvPath(ticker) {
+    return dataFilePath(ticker + ".csv");
+}
+
+
 
 module.exports = {
 	init_session: init_session,
@@ -198,5 +222,9 @@ module.exports = {
 	send_text_msg: send_text_msg,
 	decode_value: decode_value,
 	mongo_id_for_time: mongo_id_for_time,
-	unit_addr_in_set: unit_addr_in_set
+    genForStream: genForStream,
+    genForCSV: genForCSV,
+	addDataDir: addDataDir,
+	tickerCsvPath: tickerCsvPath,
+	dataFilePath: dataFilePath
 }
