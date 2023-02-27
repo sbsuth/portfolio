@@ -1,6 +1,7 @@
 var request = require('request');
 var mongo = require("mongodb");
 var fs = require('fs');
+const readline = require('readline');
 const csv = require('csv-parser')
 
 // File-scoped variables.
@@ -191,6 +192,17 @@ async function* genForCSV(csvPath) {
   }
 }
 
+// Returns an async generator with lines from the file at the given path.
+async function* genForFile(path) {
+	const rl = readline.createInterface({
+		input: fs.createReadStream(path),
+		crlfDelay: Infinity
+	});
+	for await (const line of rl) {
+		yield line;
+	}
+}
+
 var dataDirs = [];
 
 function addDataDir(dir) {
@@ -213,6 +225,50 @@ function tickerCsvPath(ticker) {
 }
 
 
+// Import a CSV file containing ticker data from my ETF sheet.
+// This should be replaced by direct access to the sheet.
+async function importTickers(file) {
+	let utils = this;
+	const path = utils.dataFilePath(file);
+	if (path == "") {
+		throw new Error("Tickers file \'"+file+"\' not found");
+	}
+	
+    const strm = utils.genForCSV( path );
+	let rslt = { date: undefined,
+				 positions : []
+			   }
+	let tickers = utils.db.get("tickers");
+    for await (const row of strm) {
+		let ticker = row['Ticker'];
+		let val = {	'ticker': ticker,
+					'name': row['Name'], 
+					'class': row['Class'], 
+					'subclass': row['Sub class']
+				  };
+		let query = { "ticker": ticker };
+		await tickers.update( query, val, {'replaceOne': true, 'upsert': true} );
+	}
+}
+
+// Load ticker data into an object whose keys are tickers.
+async function getTickers(refresh) {
+	var utils = this;
+	if (utils.tickers && !refresh) {
+		return utils.tickers;
+	}
+	let tickers = utils.db.get("tickers");
+	let data = await tickers.find();
+	let rslt = {};
+	for ( let i=0; i < data.length; i++ ) {
+		let d = Object.assign({},data[i]);
+		rslt[d.ticker] = d;
+		delete d._id;
+		delete d.ticker;
+	}
+	utils.tickers = rslt;
+	return rslt;
+}
 
 module.exports = {
 	init_session: init_session,
@@ -224,7 +280,10 @@ module.exports = {
 	mongo_id_for_time: mongo_id_for_time,
     genForStream: genForStream,
     genForCSV: genForCSV,
+    genForFile: genForFile,
 	addDataDir: addDataDir,
 	tickerCsvPath: tickerCsvPath,
-	dataFilePath: dataFilePath
+	dataFilePath: dataFilePath,
+	importTickers: importTickers,
+	getTickers: getTickers
 }

@@ -42,7 +42,6 @@ router.post('/login', function(req, res) {
 	var username = req.body.username;
 	var password = req.body.password;
 	var target_url = req.body.target_url;
-console.log("HEY: Querying users");
 	req.db.get('users').find({username: username}).then( (doc) => {
 		var msg = undefined;
 		if (doc.length != 1) {
@@ -51,7 +50,6 @@ console.log("HEY: Querying users");
 			// The password is hashed on the client, and we hash it again
 			// before storing, so hash before comparing.
 			var hashed = SHA256(String(SHA256(password)));
-console.log("HEY: password="+password+", hashed="+hashed+", doc.password="+ doc[0].password);
 			if (doc[0].password != hashed) {
 				msg = "Bad password.  Try again.";
 			} else {

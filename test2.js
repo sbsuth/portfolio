@@ -1,6 +1,7 @@
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('192.168.227.150:27017/finance');
+//var db = monk('192.168.227.150:27017/finance');
+var db = monk('localhost:27017/finance');
 
 async function testDB() {
 	var test = db.get('test');

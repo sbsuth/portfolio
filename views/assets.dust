@@ -16,48 +16,37 @@
 	<div class="container-fluid">
 		<div class="row">
 
-			{#monitors}
+			{#accounts}
 			<div class="col-xs-12 col-sm-6">
 				<div class="x_panel">
 				 <div class="x_title">
 					<table width=100%><tr>
 					  <td ><h2>{label}</h2></td>
-					  <td class="monitor_enabled"><input id=monitor-enabled-{name}-bool type="checkbox" data-group-cls="btn-group-sm" ></td>
 					</tr></td></table>
 				 </div>
 				 <div class="x_content">
 					<div class="row">
 						<div class="col-xs-6">
 							<table class="x_table" width=100%>
-							{#view_settings}
+							<tr class=x_row>
+							{#titles}
+								<th class="w_30">{.}</th>
+							{/titles}
+							</tr>
+							{#assets}
 								<tr class=x_row>
-									<td class="w_30">{label}</td>
-									<td>
-										{?link}
-											<a href={href} class="btn btn-primary active" width=40>{link}</a>
-										{:else}
-											<div class="input-group input-group-sm">
-												<input type="text" class="form-control" id=monitor-{field}-{name}-{type}>
-												<span class="input-group-btn"> <button class="btn btn-default" type="button" id="monitor-{field}-{name}-{type}-button" onclick='monitors.setValue(event)'><i class="glyphicon glyphicon-upload"/></button> </span>
-											</div><!-- /input-group -->
-										{/link}
-									</td>
+									<td class="w_30"><p title="{descr}">{ticker}</p></td>
+									<td class="w_30">{shares}</td>
+									<td class="w_30">{price}</td>
 								</tr>
-							{/view_settings}
-							</table>
-						</div>
-						<div class="col-xs-6">
-							<table class="x_table" width=100%>
-							{#view_status}
-								<tr class=x_row><td >{label}:</td><td><p id=monitor-{field}-{name}-{type}>(no value)</p></td></tr>
-							{/view_status}
+							{/assets}
 							</table>
 						</div>
 					</div>
 				 </div>
 				</div>
 			</div><!--col-->
-			{/monitors}
+			{/accounts}
 
 		</div><!--row-->
 	</div><!--container-->
