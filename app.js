@@ -8,6 +8,7 @@ var logger = require('morgan');
 var session = require('express-session')
 var MongoStore = require('connect-mongo')
 var positions = require('./modules/positions');
+var quote = require('./modules/quote');
 var utils = require("./modules/utils");
 
 var mongo = require('mongodb');
@@ -79,6 +80,7 @@ utils.addDataDir("./data_files");
 //utils.getTickers().then(rslt=>{console.log(rslt)});
 //utils.importTickers("etfs.csv");
 //positions.test().then(rslt=>{process.exit()});
+quote.test().then(rslt=>{process.exit()});
 
 
 // catch 404 and forward to error handler
